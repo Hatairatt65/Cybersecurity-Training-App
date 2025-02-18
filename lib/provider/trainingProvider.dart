@@ -1,8 +1,8 @@
 import 'package:account/model/transaction.dart';
 import 'package:flutter/foundation.dart';
-import 'package:account/database/transactionDB.dart';
+import 'package:account/database/trainingDB.dart';
 
-class TransactionProvider with ChangeNotifier {
+class TrainingProvider with ChangeNotifier {
   List<TransactionItem> transactions = [
     //   Transaction(title: 'เสื้อยืด', amount: 200, dateTime: DateTime(2024, 12, 1, 9, 0)),
     //   Transaction(title: 'รองเท้า', amount: 1500, dateTime: DateTime(2024, 11, 1, 9, 0)),
@@ -12,20 +12,20 @@ class TransactionProvider with ChangeNotifier {
   List<TransactionItem> getTransaction() => transactions;
 
   initData() async {
-    var db = TransactionDB(dbName: 'transaction.db');
+    var db = TrainingDB(dbName: 'transaction.db');
     transactions = await db.loadAllData();
     notifyListeners();
   }
 
   Future<void> loadTransaction() async {
-    var db = TransactionDB(dbName: 'transaction.db');
+    var db = TrainingDB(dbName: 'transaction.db');
 
     transactions = await db.loadAllData();
     notifyListeners();
   }
 
   void addTransaction(TransactionItem transaction) async {
-    var db = TransactionDB(dbName: 'transaction.db');
+    var db = TrainingDB(dbName: 'transaction.db');
 
     await db.insertDatabase(transaction);
     transactions = await db.loadAllData();
@@ -33,7 +33,7 @@ class TransactionProvider with ChangeNotifier {
   }
 
   updateTransaction(TransactionItem transaction) async {
-    var db = TransactionDB(dbName: 'transaction.db');
+    var db = TrainingDB(dbName: 'transaction.db');
 
     await db.updateData(transaction);
     transactions = await db.loadAllData();
@@ -41,7 +41,7 @@ class TransactionProvider with ChangeNotifier {
   }
 
   deleteTransaction(TransactionItem transaction) async {
-    var db = TransactionDB(dbName: 'transaction.db');
+    var db = TrainingDB(dbName: 'transaction.db');
     await db.deleteData(transaction);
     transactions = await db.loadAllData();
     notifyListeners();

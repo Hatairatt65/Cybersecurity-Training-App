@@ -1,16 +1,16 @@
 import 'package:account/model/transaction.dart';
-import 'package:account/provider/transactionProvider.dart';
+import 'package:account/provider/trainingProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class FormScreen extends StatefulWidget {
-  const FormScreen({super.key});
+class AddTrainingScreen extends StatefulWidget {
+  const AddTrainingScreen({super.key});
 
   @override
-  State<FormScreen> createState() => _FormScreenState();
+  State<AddTrainingScreen> createState() => _AddTrainingScreenState();
 }
 
-class _FormScreenState extends State<FormScreen> {
+class _AddTrainingScreenState extends State<AddTrainingScreen> {
   final formKey = GlobalKey<FormState>();
   final titleController = TextEditingController();
   final amountController = TextEditingController();
@@ -73,7 +73,7 @@ class _FormScreenState extends State<FormScreen> {
                     ElevatedButton(
                       onPressed: () {
                         if (formKey.currentState!.validate()) {
-                          var provider = Provider.of<TransactionProvider>(context, listen: false);
+                          var provider = Provider.of<TrainingProvider>(context, listen: false);
                           TransactionItem item = TransactionItem(
                             title: titleController.text, 
                             amount: double.parse(amountController.text), 

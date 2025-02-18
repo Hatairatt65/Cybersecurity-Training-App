@@ -6,10 +6,10 @@ import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 import 'package:account/model/transaction.dart';
 
-class TransactionDB {
+class TrainingDB {
   String dbName;
 
-  TransactionDB({required this.dbName});
+  TrainingDB({required this.dbName});
 
   Future<Database> openDatabase() async {
     Directory appDir = await getApplicationDocumentsDirectory();

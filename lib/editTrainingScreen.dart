@@ -1,18 +1,18 @@
 import 'package:account/model/transaction.dart';
-import 'package:account/provider/transactionProvider.dart';
+import 'package:account/provider/trainingProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class EditScreen extends StatefulWidget {
+class EditTrainingScreen extends StatefulWidget {
   TransactionItem item;
 
-  EditScreen({super.key, required this.item});
+  EditTrainingScreen({super.key, required this.item});
 
   @override
-  State<EditScreen> createState() => _EditScreenState();
+  State<EditTrainingScreen> createState() => _EditTrainingScreenState();
 }
 
-class _EditScreenState extends State<EditScreen> {
+class _EditTrainingScreenState extends State<EditTrainingScreen> {
   final formKey = GlobalKey<FormState>();
   final titleController = TextEditingController();
   final amountController = TextEditingController();
@@ -28,7 +28,7 @@ class _EditScreenState extends State<EditScreen> {
 
   void _updateTransaction() {
     if (formKey.currentState!.validate()) {
-      var provider = Provider.of<TransactionProvider>(context, listen: false);
+      var provider = Provider.of<TrainingProvider>(context, listen: false);
       TransactionItem item = TransactionItem(
         keyID: widget.item.keyID,
         title: titleController.text,
