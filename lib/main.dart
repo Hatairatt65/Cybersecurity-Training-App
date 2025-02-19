@@ -1,13 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:account/addTrainingScreen.dart';
+import 'registrationscreen.dart';
 import 'package:account/editTrainingScreen.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:account/model/transaction.dart';
 import 'package:account/provider/trainingProvider.dart';
-
+import 'model/instructorProvider.dart';
+import 'model/instructor.dart';
+import 'model/registration.dart';
+import 'model/registrationProvider.dart';
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => InstructorProvider()), // เพิ่ม Provider ของ InstructorProvider
+        ChangeNotifierProvider(create: (_) => RegistrationProvider()), // เพิ่ม Provider ของ RegistrationProvider
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -246,18 +258,87 @@ class _TrainingHomePageState extends State<TrainingHomePage> {
   }
 }
 
-// Courses Page (Placeholder)
 class CoursesPage extends StatelessWidget {
   const CoursesPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<InstructorProvider>(context); // ใช้ InstructorProvider
+    final instructors = provider.instructors.take(10).toList(); // ดึง 10 รายการแรก
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Courses'),
+        title: const Text(
+          'Cybersecurity Courses',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+        ),
+        backgroundColor: Colors.blueGrey.shade700,
       ),
-      body: const Center(
-        child: Text('Courses Page Content'),
+      body: ListView.builder(
+        itemCount: instructors.length,
+        itemBuilder: (context, index) {
+          final instructor = instructors[index];
+          return Card(
+            margin: EdgeInsets.all(15),
+            elevation: 10,
+            shadowColor: Colors.blueGrey.shade400,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: ListTile(
+              contentPadding: EdgeInsets.all(15),
+              title: Text(
+                '${instructor.courseName}',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.blueGrey.shade900,
+                ),
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 8),
+                  Text(
+                    'Instructor: ${instructor.instructorName}',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.blueGrey.shade600,
+                    ),
+                  ),
+                  SizedBox(height: 6),
+                  Text(
+                    'Education: ${instructor.education}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.blueGrey.shade500,
+                    ),
+                  ),
+                  SizedBox(height: 6),
+                  Text(
+                    'Participants: ${instructor.participantsCount}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.green.shade700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Registrationscreen()),
+          );
+        },
+        child: const Icon(Icons.add, color: Colors.white),
+        backgroundColor: Colors.blueGrey.shade600,
+        elevation: 8,
       ),
     );
   }
@@ -452,3 +533,5 @@ class _QuizzesPageState extends State<QuizzesPage> {
     );
   }
 }
+
+
