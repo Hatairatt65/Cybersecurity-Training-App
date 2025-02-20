@@ -10,12 +10,14 @@ import 'model/instructorProvider.dart';
 import 'model/instructor.dart';
 import 'model/registration.dart';
 import 'model/registrationProvider.dart';
+import 'package:account/Cybersecurity.dart'; // นำเข้าหน้ารายละเอียดคอร์ส
 void main() {
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => InstructorProvider()), // เพิ่ม Provider ของ InstructorProvider
-        ChangeNotifierProvider(create: (_) => RegistrationProvider()), // เพิ่ม Provider ของ RegistrationProvider
+        ChangeNotifierProvider(create: (_) => RegistrationProvider()),
+        ChangeNotifierProvider(create: (context) => InstructorProvider()), // เพิ่ม Provider ของ RegistrationProvider
       ],
       child: const MyApp(),
     ),
@@ -257,7 +259,6 @@ class _TrainingHomePageState extends State<TrainingHomePage> {
     );
   }
 }
-
 class CoursesPage extends StatelessWidget {
   const CoursesPage({super.key});
 
@@ -274,67 +275,145 @@ class CoursesPage extends StatelessWidget {
         ),
         backgroundColor: Colors.blueGrey.shade700,
       ),
-      body: ListView.builder(
-        itemCount: instructors.length,
-        itemBuilder: (context, index) {
-          final instructor = instructors[index];
-          return Card(
-            margin: EdgeInsets.all(15),
-            elevation: 10,
-            shadowColor: Colors.blueGrey.shade400,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
+      body: instructors.isEmpty
+          ? Center(child: Text('ไม่มีหลักสูตรที่แสดง'))
+          : ListView.builder(
+              itemCount: instructors.length,
+              itemBuilder: (context, index) {
+                final instructor = instructors[index];
+                return Card(
+                  margin: EdgeInsets.all(15),
+                  elevation: 10,
+                  shadowColor: Colors.blueGrey.shade400,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: ListTile(
+                    contentPadding: EdgeInsets.all(15),
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '${instructor.courseName}',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.blueGrey.shade900,
+                          ),
+                        ),
+                        // เปลี่ยนจากลูกศรเป็นไอคอนเอกสาร
+                        if (instructor.isRegistered)
+                          IconButton(
+                            onPressed: () {
+                              // ไปหน้าเนื้อหาคอร์สเมื่อกด
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Cybersecurity(
+                                    course: instructor, // ส่งข้อมูลคอร์สไปยังหน้าเนื้อหาคอร์ส
+                                  ),
+                                ),
+                              );
+                            },
+                            icon: Icon(Icons.description, color: Colors.blueGrey.shade700),
+                          ),
+                      ],
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 8),
+                        Text(
+                          'Instructor: ${instructor.instructorName}',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.blueGrey.shade600,
+                          ),
+                        ),
+                        SizedBox(height: 6),
+                        Text(
+                          'Education: ${instructor.education}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.blueGrey.shade500,
+                          ),
+                        ),
+                        SizedBox(height: 6),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Participants: ${instructor.participantsCount}',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.green.shade700,
+                              ),
+                            ),
+                            // แสดงข้อความ "กำลังอบรม" ถ้าลงทะเบียนแล้ว
+                            if (instructor.isRegistered)
+                              Row(
+                                children: [
+                                  Text(
+                                    'กำลังอบรม',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: const Text('ยืนยันการยกเลิก'),
+                                            content: const Text('คุณแน่ใจหรือว่าต้องการยกเลิกการลงทะเบียน?'),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: const Text('ยกเลิก'),
+                                              ),
+                                              TextButton(
+                                                onPressed: () async {
+                                                  // ทำการยกเลิกการลงทะเบียน
+                                                  provider.cancelRegistration(instructor);
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: const Text('ยืนยัน'),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                    icon: Icon(Icons.cancel, color: Colors.red.shade600),
+                                  ),
+                                ],
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
-            child: ListTile(
-              contentPadding: EdgeInsets.all(15),
-              title: Text(
-                '${instructor.courseName}',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.blueGrey.shade900,
-                ),
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 8),
-                  Text(
-                    'Instructor: ${instructor.instructorName}',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.blueGrey.shade600,
-                    ),
-                  ),
-                  SizedBox(height: 6),
-                  Text(
-                    'Education: ${instructor.education}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.blueGrey.shade500,
-                    ),
-                  ),
-                  SizedBox(height: 6),
-                  Text(
-                    'Participants: ${instructor.participantsCount}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green.shade700,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
+          // ไปหน้า RegistrationScreen เพื่อลงทะเบียน
           final result = await Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => Registrationscreen()),
           );
+          
+          // อัพเดตหน้าหลักหลังจากกลับจากหน้า RegistrationScreen
+          if (result != null && result == 'success') {
+            // ทำการรีเฟรชข้อมูล หรือดำเนินการที่ต้องการหลังจากลงทะเบียนเสร็จ
+          }
         },
         child: const Icon(Icons.add, color: Colors.white),
         backgroundColor: Colors.blueGrey.shade600,

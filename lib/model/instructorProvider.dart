@@ -1,6 +1,7 @@
 // instructorProvider.dart
 import 'package:flutter/foundation.dart';
 import 'instructor.dart';
+import 'package:flutter/material.dart';
 
 class InstructorProvider with ChangeNotifier {
   List<Instructor> _instructors = [
@@ -21,5 +22,18 @@ class InstructorProvider with ChangeNotifier {
   void addInstructor(Instructor instructor) {
     _instructors.add(instructor);
     notifyListeners();
+  }
+  void registerCourse(String courseName) {
+    final instructor = _instructors.firstWhere((instructor) => instructor.courseName == courseName);
+    instructor.isRegistered = true;
+    notifyListeners();
+  }
+  void cancelRegistration(Instructor instructor) {
+    // ตรวจสอบว่า instructor อยู่ในรายการหรือไม่
+    if (_instructors.contains(instructor)) {
+      // ทำการยกเลิกการลงทะเบียน
+      instructor.isRegistered = false;
+      notifyListeners(); // อัพเดต UI หลังจากยกเลิก
+    }
   }
 }

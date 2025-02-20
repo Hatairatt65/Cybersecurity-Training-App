@@ -1,15 +1,15 @@
-import 'package:flutter/foundation.dart';
-
 class Instructor {
-  String courseName;
-  String instructorName;
-  String education;
-  int participantsCount;
+  final String courseName;
+  final String instructorName;
+  final String education;
+  final int participantsCount;
+  bool isRegistered;
 
   Instructor({
     required this.courseName,
     required this.instructorName,
     required this.education,
     required this.participantsCount,
+    this.isRegistered = false,
   });
 }
