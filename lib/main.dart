@@ -259,6 +259,7 @@ class _TrainingHomePageState extends State<TrainingHomePage> {
     );
   }
 }
+
 class CoursesPage extends StatelessWidget {
   const CoursesPage({super.key});
 
@@ -266,6 +267,9 @@ class CoursesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = Provider.of<InstructorProvider>(context); // ใช้ InstructorProvider
     final instructors = provider.instructors.take(10).toList(); // ดึง 10 รายการแรก
+
+    // เช็คว่าผู้ใช้ลงทะเบียนคอร์สไปแล้วหรือยัง
+    final isRegistered = provider.instructors.any((instructor) => instructor.isRegistered);
 
     return Scaffold(
       appBar: AppBar(
@@ -301,7 +305,6 @@ class CoursesPage extends StatelessWidget {
                             color: Colors.blueGrey.shade900,
                           ),
                         ),
-                        // เปลี่ยนจากลูกศรเป็นไอคอนเอกสาร
                         if (instructor.isRegistered)
                           IconButton(
                             onPressed: () {
@@ -310,7 +313,7 @@ class CoursesPage extends StatelessWidget {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => Cybersecurity(
-                                    course: instructor, // ส่งข้อมูลคอร์สไปยังหน้าเนื้อหาคอร์ส
+                                    course: instructor,
                                   ),
                                 ),
                               );
@@ -350,7 +353,6 @@ class CoursesPage extends StatelessWidget {
                                 color: Colors.green.shade700,
                               ),
                             ),
-                            // แสดงข้อความ "กำลังอบรม" ถ้าลงทะเบียนแล้ว
                             if (instructor.isRegistered)
                               Row(
                                 children: [
@@ -404,15 +406,36 @@ class CoursesPage extends StatelessWidget {
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // ไปหน้า RegistrationScreen เพื่อลงทะเบียน
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => Registrationscreen()),
-          );
-          
-          // อัพเดตหน้าหลักหลังจากกลับจากหน้า RegistrationScreen
-          if (result != null && result == 'success') {
-            // ทำการรีเฟรชข้อมูล หรือดำเนินการที่ต้องการหลังจากลงทะเบียนเสร็จ
+          // เช็คว่าผู้ใช้ลงทะเบียนคอร์สไปแล้วหรือยัง
+          if (isRegistered) {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('ไม่สามารถลงทะเบียนได้'),
+                  content: Text('คุณได้ลงคอร์สอบรมแล้วเพียง 1 คอร์สเท่านั้น'),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text('ตกลง'),
+                    ),
+                  ],
+                );
+              },
+            );
+          } else {
+            // ไปหน้า RegistrationScreen เพื่อลงทะเบียน
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => Registrationscreen()),
+            );
+            
+            // อัพเดตหน้าหลักหลังจากกลับจากหน้า RegistrationScreen
+            if (result != null && result == 'success') {
+              // ทำการรีเฟรชข้อมูล หรือดำเนินการที่ต้องการหลังจากลงทะเบียนเสร็จ
+            }
           }
         },
         child: const Icon(Icons.add, color: Colors.white),
@@ -423,7 +446,6 @@ class CoursesPage extends StatelessWidget {
   }
 }
 
-
 class QuizzesPage extends StatefulWidget {
   const QuizzesPage({super.key});
 
@@ -433,81 +455,7 @@ class QuizzesPage extends StatefulWidget {
 
 class _QuizzesPageState extends State<QuizzesPage> {
   final List<Map<String, dynamic>> _quizQuestions = [
-  {
-    "question": "คำถามที่ 1 ข้อใดคือแนวทางที่ดีที่สุดในการเลือกใช้รหัสผ่าน?",
-    "options": ["ใช้รหัสผ่านที่ง่ายและจำได้ง่าย", "ใช้รหัสผ่านที่ประกอบด้วยตัวอักษรและตัวเลข", "ใช้รหัสผ่านที่ประกอบด้วยตัวอักษรพิเศษ, ตัวเลข และตัวอักษรใหญ่-เล็ก", "ใช้รหัสผ่านเดียวสำหรับทุกเว็บไซต์"],
-    "answer": "ใช้รหัสผ่านที่ประกอบด้วยตัวอักษรพิเศษ, ตัวเลข และตัวอักษรใหญ่-เล็ก"
-  },
-  {
-    "question": "คำถามที่ 2 ข้อใดคือการโจมตีแบบ phishing?",
-    "options": ["การแอบแฝงตัวเป็นผู้ใช้ที่ถูกต้อง", "การโจมตีผ่านเครือข่าย", "การโจมตีเพื่อขโมยข้อมูลทางการเงิน", "การโจมตีโดยการใช้มัลแวร์"],
-    "answer": "การแอบแฝงตัวเป็นผู้ใช้ที่ถูกต้อง"
-  },
-  {
-    "question": "คำถามที่ 3 ข้อใดคือเครื่องมือที่ใช้ในการตรวจสอบความปลอดภัยของเว็บไซต์?",
-    "options": ["Wireshark", "Metasploit", "Burp Suite", "Kali Linux"],
-    "answer": "Burp Suite"
-  },
-  {
-    "question": "คำถามที่ 4 การใช้งาน VPN ช่วยป้องกันความปลอดภัยอย่างไร?",
-    "options": ["การเข้ารหัสการเชื่อมต่อระหว่างเครื่องผู้ใช้และเซิร์ฟเวอร์", "ป้องกันการโจมตีทางฟิชชิ่ง", "ป้องกันการโจมตีจากแฮกเกอร์ในเครือข่ายไร้สาย", "ไม่เกี่ยวข้องกับความปลอดภัย"],
-    "answer": "การเข้ารหัสการเชื่อมต่อระหว่างเครื่องผู้ใช้และเซิร์ฟเวอร์"
-  },
-  {
-    "question": "คำถามที่ 5 การอัพเดตซอฟต์แวร์เป็นประจำช่วยป้องกันการโจมตีทางไซเบอร์ได้อย่างไร?",
-    "options": ["ช่วยป้องกันช่องโหว่ที่อาจถูกแฮกเกอร์ใช้โจมตี", "ทำให้ซอฟต์แวร์ทำงานได้เร็วขึ้น", "ไม่เกี่ยวข้องกับความปลอดภัย", "ช่วยในการเชื่อมต่ออินเทอร์เน็ตได้ดีขึ้น"],
-    "answer": "ช่วยป้องกันช่องโหว่ที่อาจถูกแฮกเกอร์ใช้โจมตี"
-  },
-  {
-    "question": "คำถามที่ 6 ข้อใดคือการโจมตีแบบ DDoS?",
-    "options": ["การโจมตีด้วยการใช้มัลแวร์", "การโจมตีด้วยการดักจับข้อมูล", "การโจมตีด้วยการส่งคำขอจากหลายๆ เครื่องเพื่อทำให้เซิร์ฟเวอร์ล่ม", "การโจมตีเพื่อขโมยข้อมูลส่วนตัว"],
-    "answer": "การโจมตีด้วยการส่งคำขอจากหลายๆ เครื่องเพื่อทำให้เซิร์ฟเวอร์ล่ม"
-  },
-  {
-    "question": "คำถามที่ 7 ข้อใดคือวิธีการป้องกันการโจมตีแบบ SQL Injection?",
-    "options": ["การใช้ SSL/TLS", "การใช้ prepared statements ในการเขียน query", "การใช้รหัสผ่านที่ซับซ้อน", "การใช้ VPN"],
-    "answer": "การใช้ prepared statements ในการเขียน query"
-  },
-  {
-    "question": "คำถามที่ 8 ในการจัดการกับความปลอดภัยในองค์กร ควรมีนโยบายด้านความปลอดภัยใดบ้าง?",
-    "options": ["การใช้รหัสผ่านที่แข็งแกร่ง", "การอบรมการใช้งานเครื่องมือความปลอดภัย", "การจำกัดสิทธิ์การเข้าถึงข้อมูล", "ทุกข้อ"],
-    "answer": "ทุกข้อ"
-  },
-  {
-    "question": "คำถามที่ 9 ข้อใดคือฟังก์ชันหลักของการใช้ Firewalls?",
-    "options": ["ป้องกันการเข้าถึงข้อมูลจากแหล่งที่ไม่รู้จัก", "ป้องกันการโจมตี DDoS", "ป้องกันการทำงานของมัลแวร์", "การเข้ารหัสข้อมูล"],
-    "answer": "ป้องกันการเข้าถึงข้อมูลจากแหล่งที่ไม่รู้จัก"
-  },
-  {
-    "question": "คำถามที่ 10 การใช้รหัสผ่านที่ยาวกว่าช่วยให้มั่นคงปลอดภัยขึ้นอย่างไร?",
-    "options": ["เพิ่มความยากในการเดารหัสผ่าน", "ทำให้ผู้ใช้จำรหัสผ่านได้ง่ายขึ้น", "ทำให้การโจมตีด้วย brute force ยากขึ้น", "ไม่ส่งผลต่อความปลอดภัย"],
-    "answer": "เพิ่มความยากในการเดารหัสผ่าน"
-  },
-  {
-    "question": "คำถามที่ 11 การใช้ซอฟต์แวร์อัพเดตอัตโนมัติช่วยป้องกันภัยคุกคามทางไซเบอร์ได้อย่างไร?",
-    "options": ["ป้องกันช่องโหว่จากการที่ซอฟต์แวร์ล้าสมัย", "ทำให้เครื่องทำงานเร็วขึ้น", "ทำให้ซอฟต์แวร์ถูกแฮกได้ง่ายขึ้น", "ไม่มีผลต่อความปลอดภัย"],
-    "answer": "ป้องกันช่องโหว่จากการที่ซอฟต์แวร์ล้าสมัย"
-  },
-  {
-    "question": "คำถามที่ 12 ข้อใดคือลักษณะของการโจมตีแบบ Man-in-the-Middle?",
-    "options": ["การดักจับการสื่อสารระหว่างผู้ใช้กับเซิร์ฟเวอร์", "การปลอมแปลงเว็บไซต์เพื่อขโมยข้อมูล", "การขโมยรหัสผ่านจากการเชื่อมต่อที่ไม่ปลอดภัย", "ทุกข้อ"],
-    "answer": "ทุกข้อ"
-  },
-  {
-    "question": "คำถามที่ 13 ข้อใดคือความหมายของคำว่า 'Zero-Day Attack'?",
-    "options": ["การโจมตีที่เกิดขึ้นทันทีที่ช่องโหว่ถูกค้นพบ", "การโจมตีที่ใช้เวลานานในการวางแผน", "การโจมตีที่ใช้การลักลอบข้อมูล", "การโจมตีที่ไม่สามารถป้องกันได้"],
-    "answer": "การโจมตีที่เกิดขึ้นทันทีที่ช่องโหว่ถูกค้นพบ"
-  },
-  {
-    "question": "คำถามที่ 14 การใช้การตรวจสอบแบบ Two-Factor Authentication (2FA) ช่วยเพิ่มความปลอดภัยได้อย่างไร?",
-    "options": ["ต้องใช้ทั้งรหัสผ่านและโค้ดที่ได้รับจากอุปกรณ์อื่น", "ต้องใช้รหัสผ่านที่ยากขึ้น", "ต้องใช้การเข้ารหัสแบบสองชั้น", "ต้องใช้รหัสผ่านที่เปลี่ยนทุกครั้ง"],
-    "answer": "ต้องใช้ทั้งรหัสผ่านและโค้ดที่ได้รับจากอุปกรณ์อื่น"
-  },
-  {
-    "question": "คำถามที่ 15 การป้องกันภัยคุกคามทางไซเบอร์ที่ดีที่สุดคือการทำ?",
-    "options": ["การอบรมให้ผู้ใช้รู้จักการปฏิบัติตามหลักความปลอดภัย", "การใช้ซอฟต์แวร์ป้องกันไวรัส", "การติดตั้งไฟร์วอลล์", "ทุกข้อ"],
-    "answer": "ทุกข้อ"
-  }
+  
 ];
 
   Map<int, String?> _selectedAnswers = {};
