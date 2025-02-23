@@ -1,0 +1,2 @@
+D:/65315369 Mobile/Cybersecurity-Training-App/android/app/.cxx/Debug/n1s3l2p4/armeabi-v7a/CMakeFiles/edit_cache.dir
+D:/65315369 Mobile/Cybersecurity-Training-App/android/app/.cxx/Debug/n1s3l2p4/armeabi-v7a/CMakeFiles/rebuild_cache.dir

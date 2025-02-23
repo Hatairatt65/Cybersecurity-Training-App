@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'model/instructorProvider.dart';
+import '../model/instructorProvider.dart';
 import 'package:intl/intl.dart';
-import 'model/instructor.dart';
+import '../model/instructor.dart';
 
 class Registrationscreen extends StatefulWidget {
   @override
@@ -23,7 +23,7 @@ class _RegistrationscreenState extends State<Registrationscreen> {
     final courses = instructorProvider.instructors.map((instructor) => instructor.courseName).toList();
 
     return Scaffold(
-      appBar: AppBar(title: Text("ลงทะเบียน")),
+      appBar: AppBar(title: Text("ลงอบรมหลักสูตร")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -66,12 +66,12 @@ class _RegistrationscreenState extends State<Registrationscreen> {
 
             // วันที่และเวลา
             if (registrationDate != null)
-              Text("ลงทะเบียนเมื่อ: ${DateFormat('dd/MM/yyyy HH:mm').format(registrationDate!)}"),
+              Text("ลงอบรมเมื่อ: ${DateFormat('dd/MM/yyyy HH:mm').format(registrationDate!)}"),
             
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: _isRegistering ? null : register,
-              child: _isRegistering ? CircularProgressIndicator() : Text("ลงทะเบียน"),
+              child: _isRegistering ? CircularProgressIndicator() : Text("ลงอบรม"),
             ),
           ],
         ),
@@ -100,7 +100,7 @@ class _RegistrationscreenState extends State<Registrationscreen> {
         registrationDate = DateTime.now();
       });
 
-      showSuccessMessage("ลงทะเบียนสำเร็จ!");
+      showSuccessMessage("ลงอบรมสำเร็จ!");
       Navigator.pushReplacementNamed(context, '/courses'); // ไปยังหน้า CoursesPage
     } else {
       showErrorMessage(response.message);
@@ -113,7 +113,6 @@ class _RegistrationscreenState extends State<Registrationscreen> {
     });
   }
 }
-
 
   Future<Response> registerUser(String courseName) async {
     await Future.delayed(Duration(seconds: 2)); // จำลองการเรียก API
