@@ -415,14 +415,14 @@ class CoursesPage extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Instructor: ${instructor.instructorName}',
+                              '👩‍🏫 ผู้สอน: ${instructor.instructorName}',
                               style: TextStyle(
                                   fontSize: 16,
                                   color: Colors.blueGrey.shade600),
                             ),
                             SizedBox(height: 8),
                             Text(
-                              'Education: ${instructor.education}',
+                              '🎓 การศึกษา: ${instructor.education}',
                               style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.blueGrey.shade500),
@@ -432,7 +432,7 @@ class CoursesPage extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  'Participants: ${instructor.participantsCount}',
+                                  '🧑‍🤝‍🧑 จำนวนผู้เข้าร่วม: ${instructor.participantsCount}',
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,

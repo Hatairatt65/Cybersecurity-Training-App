@@ -20,99 +20,208 @@ class _RegistrationscreenState extends State<Registrationscreen> {
   @override
   Widget build(BuildContext context) {
     final instructorProvider = Provider.of<InstructorProvider>(context);
-    final courses = instructorProvider.instructors.map((instructor) => instructor.courseName).toList();
+    final courses = instructorProvider.instructors
+        .map((instructor) => instructor.courseName)
+        .toList();
 
     return Scaffold(
-      appBar: AppBar(title: Text("ลงอบรมหลักสูตร")),
+      appBar: AppBar(
+        title: Text("ลงอบรมหลักสูตร"),
+        backgroundColor: Colors.blueGrey,
+        centerTitle: true,
+        elevation: 0,
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // Dropdown for Course Selection
-            DropdownButton<String>(
-              value: selectedCourse,
-              hint: Text("เลือกหลักสูตร"),
-              onChanged: (newValue) {
-                setState(() {
-                  selectedCourse = newValue;
-                  if (newValue != null) {
-                    final selectedInstructor = instructorProvider.instructors.firstWhere((instructor) => instructor.courseName == newValue);
-                    instructorName = selectedInstructor.instructorName;
-                    education = selectedInstructor.education;
-                    participantsCount = selectedInstructor.participantsCount;
-                  }
-                });
-              },
-              items: courses.map<DropdownMenuItem<String>>((String course) {
-                return DropdownMenuItem<String>(
-                  value: course,
-                  child: Text(course),
-                );
-              }).toList(),
-            ),
-            
-            // รายละเอียดของ Course ที่เลือก
-            if (selectedCourse != null)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("ผู้สอน: $instructorName"),
-                  Text("จำนวนผู้เข้าร่วม: $participantsCount"),
-                  Text("การศึกษา: $education"),
-                ],
-              ),
-            
-            SizedBox(height: 20),
+        padding: const EdgeInsets.all(20.0),
+        child: SingleChildScrollView(
+          child: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  "เลือกหลักสูตรเพื่อการพัฒนา",
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+                SizedBox(height: 30),
 
-            // วันที่และเวลา
-            if (registrationDate != null)
-              Text("ลงอบรมเมื่อ: ${DateFormat('dd/MM/yyyy HH:mm').format(registrationDate!)}"),
-            
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _isRegistering ? null : register,
-              child: _isRegistering ? CircularProgressIndicator() : Text("ลงอบรม"),
+                // การ์ดหลักสูตร
+                Card(
+                  elevation: 12, // เพิ่มเงาที่นุ่มนวล
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20), // มุมโค้งมนมากขึ้น
+                  ),
+                  color: Colors.white,
+                  shadowColor: Colors.black.withOpacity(0.1),
+                  child: Padding(
+                    padding: const EdgeInsets.all(25.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "เลือกหลักสูตร:",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        SizedBox(height: 12),
+                        DropdownButton<String>(
+                          value: selectedCourse,
+                          hint: Text("เลือกหลักสูตร",
+                              style: TextStyle(color: Colors.grey)),
+                          onChanged: (newValue) {
+                            setState(() {
+                              selectedCourse = newValue;
+                              if (newValue != null) {
+                                final selectedInstructor = instructorProvider
+                                    .instructors
+                                    .firstWhere((instructor) =>
+                                        instructor.courseName == newValue);
+                                instructorName =
+                                    selectedInstructor.instructorName;
+                                education = selectedInstructor.education;
+                                participantsCount =
+                                    selectedInstructor.participantsCount;
+                              }
+                            });
+                          },
+                          items: courses
+                              .map<DropdownMenuItem<String>>((String course) {
+                            return DropdownMenuItem<String>(
+                              value: course,
+                              child:
+                                  Text(course, style: TextStyle(fontSize: 16)),
+                            );
+                          }).toList(),
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black87,
+                          ),
+                          isExpanded: true,
+                          dropdownColor: Colors.blueGrey.shade50,
+                        ),
+
+                        // ข้อมูลหลักสูตร
+                        if (selectedCourse != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 20.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("👩‍🏫 ผู้สอน: $instructorName",
+                                    style: TextStyle(
+                                        fontSize: 16, color: Colors.black87)),
+                                SizedBox(height: 8),
+                                Text(
+                                    "🧑‍🤝‍🧑 จำนวนผู้เข้าร่วม: $participantsCount",
+                                    style: TextStyle(
+                                        fontSize: 16, color: Colors.black87)),
+                                SizedBox(height: 8),
+                                Text("🎓 การศึกษา: $education",
+                                    style: TextStyle(
+                                        fontSize: 16, color: Colors.black87)),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // วันที่ลงอบรม
+                if (registrationDate != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Text(
+                      "⏰ ลงอบรมเมื่อ: ${DateFormat('dd/MM/yyyy HH:mm').format(registrationDate!)}",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.blueGrey),
+                    ),
+                  ),
+
+                SizedBox(height: 50),
+
+                // ปุ่มลงอบรม
+                ElevatedButton(
+                  onPressed: _isRegistering ? null : register,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueGrey, // ใช้สีเทาอมฟ้า
+                    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 40),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    elevation: 12, // ความเงาของปุ่ม
+                    shadowColor: Colors.blueGrey.withOpacity(0.2),
+                  ),
+                  child: _isRegistering
+                      ? CircularProgressIndicator(color: Colors.white)
+                      : Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.school,
+                                color: Colors.white,
+                                size: 28), // เปลี่ยนไอคอนเป็น send
+                            SizedBox(width: 10),
+                            Text(
+                              "ลงอบรม",
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
+                          ],
+                        ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
- void register() async {
-  if (_isRegistering || selectedCourse == null) {
-    showErrorMessage("กรุณาเลือกหลักสูตรก่อน");
-    return;
-  }
-
-  setState(() {
-    _isRegistering = true;
-  });
-
-  try {
-    final response = await registerUser(selectedCourse ?? "");
-
-    if (response.success) {
-      final provider = Provider.of<InstructorProvider>(context, listen: false);
-      provider.registerCourse(selectedCourse!); // อัพเดตสถานะการลงทะเบียนของหลักสูตร
-
-      setState(() {
-        registrationDate = DateTime.now();
-      });
-
-      showSuccessMessage("ลงอบรมสำเร็จ!");
-      Navigator.pushReplacementNamed(context, '/courses'); // ไปยังหน้า CoursesPage
-    } else {
-      showErrorMessage(response.message);
+  void register() async {
+    if (_isRegistering || selectedCourse == null) {
+      showErrorMessage("กรุณาเลือกหลักสูตรก่อน");
+      return;
     }
-  } catch (e) {
-    showErrorMessage("เกิดข้อผิดพลาด: $e");
-  } finally {
+
     setState(() {
-      _isRegistering = false;
+      _isRegistering = true;
     });
+
+    try {
+      final response = await registerUser(selectedCourse ?? "");
+
+      if (response.success) {
+        final provider =
+            Provider.of<InstructorProvider>(context, listen: false);
+        provider.registerCourse(selectedCourse!);
+
+        setState(() {
+          registrationDate = DateTime.now();
+        });
+
+        showSuccessMessage("ลงอบรมสำเร็จ! 🎉");
+        Navigator.pushReplacementNamed(context, '/courses');
+      } else {
+        showErrorMessage(response.message);
+      }
+    } catch (e) {
+    } finally {
+      setState(() {
+        _isRegistering = false;
+      });
+    }
   }
-}
 
   Future<Response> registerUser(String courseName) async {
     await Future.delayed(Duration(seconds: 2)); // จำลองการเรียก API
@@ -120,11 +229,13 @@ class _RegistrationscreenState extends State<Registrationscreen> {
   }
 
   void showSuccessMessage(String message) {
-    print(message); // แสดงผลเป็นข้อความแจ้งเตือน
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(message, style: TextStyle(color: Colors.green))));
   }
 
   void showErrorMessage(String message) {
-    print(message); // แสดงผลเป็นข้อความแจ้งเตือนข้อผิดพลาด
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message, style: TextStyle(color: Colors.red))));
   }
 }
 
