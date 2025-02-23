@@ -28,7 +28,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/cybersecurity.png
+    - assets/images/cs.jpg
     - assets/images/eh.jpg
     - assets/images/ns.png
     - assets/images/pt.jpg
