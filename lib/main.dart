@@ -208,17 +208,29 @@ class _TrainingHomePageState extends State<TrainingHomePage> {
     );
   }
 }
-
-class CoursesPage extends StatelessWidget {
+class CoursesPage extends StatefulWidget {
   const CoursesPage({super.key});
+
+  @override
+  _CoursesPageState createState() => _CoursesPageState();
+}
+
+class _CoursesPageState extends State<CoursesPage> {
+  String searchQuery = '';
 
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<InstructorProvider>(context);
-    final instructors =
-        provider.instructors.take(15).toList(); // ดึง 15 รายการแรก
-    final isRegistered =
-        provider.instructors.any((instructor) => instructor.isRegistered);
+    final instructors = provider.instructors.take(15).toList(); // ดึง 15 รายการแรก
+
+    // กรองข้อมูลคอร์สที่ชื่อคอร์สตรงกับคำค้นหา
+    final filteredInstructors = instructors.where((instructor) {
+      return instructor.courseName
+          .toLowerCase()
+          .contains(searchQuery.toLowerCase());
+    }).toList();
+
+    final isRegistered = provider.instructors.any((instructor) => instructor.isRegistered);
 
     return Scaffold(
       appBar: AppBar(
@@ -234,206 +246,207 @@ class CoursesPage extends StatelessWidget {
         elevation: 8.0,
         shape: RoundedRectangleBorder(),
       ),
-      body: instructors.isEmpty
-          ? Center(
-              child: Text(
-                'ไม่มีหลักสูตรที่แสดง',
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.blueGrey.shade600,
-                  fontWeight: FontWeight.w500,
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              onChanged: (value) {
+                setState(() {
+                  searchQuery = value;
+                });
+              },
+              decoration: InputDecoration(
+                labelText: 'ค้นหาหลักสูตร...',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20),
                 ),
               ),
-            )
-          : ListView.builder(
-              itemCount: instructors.length,
-              itemBuilder: (context, index) {
-                final instructor = instructors[index];
-                return Card(
-                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  elevation: 15.0, // เพิ่มมิติให้การ์ด
-                  shadowColor: Colors.blueGrey.shade600,
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.circular(20), // ทำให้การ์ดนุ่มนวลขึ้น
-                  ),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.blue.shade50, Colors.blueGrey.shade100],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+            ),
+          ),
+          Expanded(
+            child: filteredInstructors.isEmpty
+                ? Center(
+                    child: Text(
+                      'ไม่มีหลักสูตรที่แสดง',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.blueGrey.shade600,
+                        fontWeight: FontWeight.w500,
                       ),
-                      borderRadius: BorderRadius.circular(20),
                     ),
-                    child: ListTile(
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                      title: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            '${instructor.courseName}',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.blueGrey.shade900,
+                  )
+                : ListView.builder(
+                    itemCount: filteredInstructors.length,
+                    itemBuilder: (context, index) {
+                      final instructor = filteredInstructors[index];
+                      return Card(
+                        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        elevation: 15.0,
+                        shadowColor: Colors.blueGrey.shade600,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Colors.blue.shade50, Colors.blueGrey.shade100],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                          if (instructor.isRegistered)
-                            IconButton(
-                              onPressed: () {
-                                Widget courseScreen;
-                                switch (instructor.courseName) {
-                                  case 'Cybersecurity':
-                                    courseScreen =
-                                        Cybersecurity(course: instructor);
-                                    break;
-                                  case 'Ethical Hacking':
-                                    courseScreen =
-                                        EthicalHacking(course: instructor);
-                                    break;
-                                  case 'Network Security':
-                                    courseScreen =
-                                        NetworkSecurity(course: instructor);
-                                    break;
-                                  case 'Penetration Testing':
-                                    courseScreen =
-                                        PenetrationTesting(course: instructor);
-                                    break;
-                                  default:
-                                    courseScreen =
-                                        Cybersecurity(course: instructor);
-                                    break;
-                                }
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => courseScreen),
-                                );
-                              },
-                              icon: Icon(Icons.description,
-                                  color: Colors.blueGrey.shade700),
-                            ),
-                        ],
-                      ),
-                      subtitle: Padding(
-                        padding: const EdgeInsets.only(top: 10.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '👩‍🏫 ผู้สอน: ${instructor.instructorName}',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.blueGrey.shade600),
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              '🎓 การศึกษา: ${instructor.education}',
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.blueGrey.shade500),
-                            ),
-                            SizedBox(height: 8),
-                            Row(
+                          child: ListTile(
+                            contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                            title: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  '🧑‍🤝‍🧑 จำนวนผู้เข้าร่วม: ${instructor.participantsCount}',
+                                  '${instructor.courseName}',
                                   style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.green.shade700,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.blueGrey.shade900,
                                   ),
                                 ),
                                 if (instructor.isRegistered)
-                                  Row(
-                                    children: [
-                                      Text(
-                                        'กำลังอบรม',
-                                        style: TextStyle(
-                                          color: Colors.red.shade700,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                      IconButton(
-                                        onPressed: () {
-                                          showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return AlertDialog(
-                                                title: const Text(
-                                                    'ยืนยันการยกเลิก'),
-                                                content: const Text(
-                                                    'คุณแน่ใจหรือว่าต้องการยกเลิกการลงทะเบียน?'),
-                                                actions: <Widget>[
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                    },
-                                                    child: const Text('ยกเลิก'),
-                                                  ),
-                                                  TextButton(
-                                                    onPressed: () async {
-                                                      provider
-                                                          .cancelRegistration(
-                                                              instructor);
-                                                      Navigator.of(context)
-                                                          .pop();
-                                                    },
-                                                    child: const Text('ยืนยัน'),
-                                                  ),
-                                                ],
-                                              );
-                                            },
-                                          );
-                                        },
-                                        icon: Icon(Icons.cancel,
-                                            color: Colors.red.shade600),
-                                      ),
-                                      IconButton(
-                                        onPressed: () async {
-                                          final result = await Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    Registrationscreen()),
-                                          );
-
-                                          if (result != null &&
-                                              result == 'success') {
-                                            final oldCourse =
-                                                provider.instructors.firstWhere(
-                                              (instructor) =>
-                                                  instructor.isRegistered,
-                                              orElse: () => Instructor.empty(),
-                                            );
-
-                                            if (oldCourse.isRegistered) {
-                                              provider.cancelRegistration(
-                                                  oldCourse);
-                                            }
-                                            provider.refreshData();
-                                          }
-                                        },
-                                        icon: Icon(Icons.edit,
-                                            color: Colors.orange.shade700),
-                                      ),
-                                    ],
+                                  IconButton(
+                                    onPressed: () {
+                                      Widget courseScreen;
+                                      switch (instructor.courseName) {
+                                        case 'Cybersecurity':
+                                          courseScreen = Cybersecurity(course: instructor);
+                                          break;
+                                        case 'Ethical Hacking':
+                                          courseScreen = EthicalHacking(course: instructor);
+                                          break;
+                                        case 'Network Security':
+                                          courseScreen = NetworkSecurity(course: instructor);
+                                          break;
+                                        case 'Penetration Testing':
+                                          courseScreen = PenetrationTesting(course: instructor);
+                                          break;
+                                        default:
+                                          courseScreen = Cybersecurity(course: instructor);
+                                          break;
+                                      }
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => courseScreen),
+                                      );
+                                    },
+                                    icon: Icon(Icons.description, color: Colors.blueGrey.shade700),
                                   ),
                               ],
                             ),
-                          ],
+                            subtitle: Padding(
+                              padding: const EdgeInsets.only(top: 10.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '👩‍🏫 ผู้สอน: ${instructor.instructorName}',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.blueGrey.shade600),
+                                  ),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    '🎓 การศึกษา: ${instructor.education}',
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.blueGrey.shade500),
+                                  ),
+                                  SizedBox(height: 8),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        '🧑‍🤝‍🧑 จำนวนผู้เข้าร่วม: ${instructor.participantsCount}',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.green.shade700,
+                                        ),
+                                      ),
+                                      if (instructor.isRegistered)
+                                        Row(
+                                          children: [
+                                            Text(
+                                              'กำลังอบรม',
+                                              style: TextStyle(
+                                                color: Colors.red.shade700,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                            IconButton(
+                                              onPressed: () {
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (BuildContext context) {
+                                                    return AlertDialog(
+                                                      title: const Text('ยืนยันการยกเลิก'),
+                                                      content: const Text(
+                                                          'คุณแน่ใจหรือว่าต้องการยกเลิกการลงทะเบียน?'),
+                                                      actions: <Widget>[
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            Navigator.of(context).pop();
+                                                          },
+                                                          child: const Text('ยกเลิก'),
+                                                        ),
+                                                        TextButton(
+                                                          onPressed: () async {
+                                                            provider.cancelRegistration(instructor);
+                                                            Navigator.of(context).pop();
+                                                          },
+                                                          child: const Text('ยืนยัน'),
+                                                        ),
+                                                      ],
+                                                    );
+                                                  },
+                                                );
+                                              },
+                                              icon: Icon(Icons.cancel, color: Colors.red.shade600),
+                                            ),
+                                            IconButton(
+                                              onPressed: () async {
+                                                final result = await Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(builder: (context) => Registrationscreen()),
+                                                );
+
+                                                if (result != null && result == 'success') {
+                                                  final oldCourse = provider.instructors.firstWhere(
+                                                    (instructor) => instructor.isRegistered,
+                                                    orElse: () => Instructor.empty(),
+                                                  );
+
+                                                  if (oldCourse.isRegistered) {
+                                                    provider.cancelRegistration(oldCourse);
+                                                  }
+                                                  provider.refreshData();
+                                                }
+                                              },
+                                              icon: Icon(Icons.edit, color: Colors.orange.shade700),
+                                            ),
+                                          ],
+                                        ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           if (isRegistered) {
