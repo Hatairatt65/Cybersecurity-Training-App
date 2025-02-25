@@ -188,6 +188,23 @@ class _TrainingHomePageState extends State<TrainingHomePage> {
           ),
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const CoursesPage()), // Navigate to CoursesPage
+          );
+        },
+        backgroundColor: const Color.fromARGB(255, 64, 83, 92),
+        child: const Icon(
+          Icons.menu_book,
+          color: Colors.white,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12), // Round the corners
+        ),
+      ),
     );
   }
 }
